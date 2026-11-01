@@ -1,0 +1,65 @@
+# Continue-Konfiguration für lokalen Ollama-Server
+# Speicherort: %USERPROFILE%\.continue\config.yaml
+# IP-Adresse unten anpassen (Suchen & Ersetzen: 192.168..50.199)
+# Auf dem Ollama-PC selbst geht auch: http://localhost:11434
+
+name: Lokaler Ollama (Minecraft Dev)
+version: 1.0.0
+schema: v1
+
+models:
+  # Chat, Code bearbeiten, Agent-Modus
+  - name: Qwen3 Coder 30B
+    provider: ollama
+    model: qwen3-coder:30b
+    apiBase: http://localhost:11434
+    roles:
+      - chat
+      - edit
+      - apply
+    capabilities:
+      - tool_use
+    defaultCompletionOptions:
+      contextLength: 32768
+      temperature: 0.2
+
+  # Schnelle Inline-Autovervollständigung
+  - name: Qwen2.5 Coder 7B
+    provider: ollama
+    model: qwen2.5-coder:7b
+    apiBase: http://localhost:11434
+    roles:
+      - autocomplete
+    defaultCompletionOptions:
+      contextLength: 8192
+
+  # Embeddings für @codebase-Suche (vorher: ollama pull nomic-embed-text)
+  - name: Nomic Embed
+    provider: ollama
+    model: nomic-embed-text
+    apiBase: http://localhost:11434
+    roles:
+      - embed
+
+context:
+  - provider: code
+  - provider: diff
+  - provider: terminal
+  - provider: problems
+  - provider: folder
+  - provider: codebase
+  - provider: docs
+
+docs:
+  - name: Paper Docs
+    startUrl: https://docs.papermc.io/paper/dev/
+  - name: Velocity Docs
+    startUrl: https://docs.papermc.io/velocity/dev/
+
+rules:
+  - Antworte auf Deutsch, Code-Kommentare auf Englisch.
+  - Wir entwickeln Minecraft-Server-Plugins in Java 21 mit der Paper API (aktuelle 1.21.x) und für den Proxy mit der Velocity API.
+  - Build-Tool ist Gradle (Kotlin DSL), sofern im Projekt nichts anderes steht.
+  - Verwende die Paper API statt veralteter Bukkit/Spigot-Methoden; nutze Adventure (Component) für Texte statt ChatColor.
+  - Keine blockierenden Aufrufe (Datenbank, HTTP) im Main-Thread – dafür den Scheduler (async) verwenden.
+  - Wenn du dir bei einer API-Methode nicht sicher bist, sag das, statt etwas zu erfinden.
